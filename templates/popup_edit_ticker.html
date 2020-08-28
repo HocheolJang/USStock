@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>종목변경창 </title>
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+              integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+              crossorigin="anonymous">
+
+        <!--Jquery-->
+        <!--제이쿼리 쓸 때는 무조건 제이쿼리 코드를 불러와야한다-->
+        <!--안될 때는 콘솔창에 왜 안되는지 코드 확인하기...에러 메세지 확인하고 하는게 맞다. 내마음대로 이것저것 바꾸지말고-->
+
+        <script
+                src="https://code.jquery.com/jquery-3.4.1.min.js"
+                integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+                crossorigin="anonymous"></script>
+
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+                integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+                crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+                integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+                crossorigin="anonymous"></script>
+
+
+        <style>
+            #ticker {
+                text-transform: uppercase;
+            }
+
+            button {
+                float: right;
+                margin: 5px;
+            }
+        </style>
+
+        <script>
+            $(document).ready(function () {
+                console.log(location.href);
+
+                let ticker = location.href.split('=')[1]
+                $('#ticker').val(ticker);
+            })
+
+            // // 해당 칸 블락처리하기
+            // function block_ticker() {
+            //     document.getElementById("ticker").readonly
+            // }
+
+            function edit_Stocks() {
+                let ticker = $('#ticker').val();
+                let avg_price = $('#avg_price').val();
+                let quantity = $('#quantity').val();
+
+                $.ajax({
+                    type: "UPDATE",
+                    url: "/api/editStocks",
+                    data: {
+                        'ticker_edit': ticker,
+                        'avg_price_edit': avg_price,
+                        'quantity_edit': quantity
+                    },
+                    success: function (response) { // 성공하면
+                        if (response["result"] == "success") {
+                            alert(response["msg"]);
+                            window.opener.location.reload();
+                            window.close();
+                        }
+                    }
+                })
+            }
+
+
+        </script>
+
+    </head>
+    <!--    <body onload="window.resizeTo(400,800)">-->
+    <body>
+        <h4>종목변경창</h4>
+
+        <div id="stock-box" class="form-post">
+            <form>
+                <div class="form-group">
+                    <label for="ticker">티커(Ticker)</label>
+                    <input type="text" class="form-control" id="ticker" placeholder="예시 ) AAPL, TSLA">
+                </div>
+                <div class="form-group">
+                    <label for="avg_price">평균매수가($) </label>
+                    <input type="number" class="form-control" id="avg_price" placeholder="예시 ) 24.23">
+                </div>
+                <div class="form-group">
+                    <label for="quantity">수량 </label>
+                    <input type="number" class="form-control" id="quantity" placeholder="예시 ) 10, 0.1 ">
+                </div>
+
+            </form>
+        </div>
+
+        <button type="button" class="btn btn-primary" onclick="edit_Stocks()">종목저장하기</button>
+        <button type="button" class="btn btn-secondary" onclick="self.close()">닫기</button>
+
+
+    </body>
+</html>

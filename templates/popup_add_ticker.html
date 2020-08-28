@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>종목추가</title>
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+              integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+              crossorigin="anonymous">
+
+        <!--Jquery-->
+        <!--제이쿼리 쓸 때는 무조건 제이쿼리 코드를 불러와야한다-->
+        <!--안될 때는 콘솔창에 왜 안되는지 코드 확인하기...에러 메세지 확인하고 하는게 맞다. 내마음대로 이것저것 바꾸지말고-->
+
+        <script
+                src="https://code.jquery.com/jquery-3.4.1.min.js"
+                integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+                crossorigin="anonymous"></script>
+
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+                integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+                crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+                integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+                crossorigin="anonymous"></script>
+
+
+        <style>
+
+            #ticker {
+                text-transform: uppercase;
+            }
+
+            button {
+                float: right;
+                margin: 5px;
+            }
+        </style>
+
+        <script>
+            function postStocks() {
+                let ticker = $('#ticker').val();
+                let avg_price = $('#avg_price').val();
+                let quantity = $('#quantity').val();
+                let weight_rate = $('#weight_rate').val();
+
+                if (ticker == "") {
+                    alert("티커를 입력해주세요")
+                    $("#ticker").focus()
+                    return
+                } else if (avg_price == "") {
+                    alert("평균매수가를 입력해주세요")
+                    $("#avg_price").focus()
+                    return
+                } else if (quantity == "") {
+                    alert("수량을 입력해주세요")
+                    $("#quantity").focus()
+                    return
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "/api/addStocks",
+                    data: {
+                        'ticker_give': ticker.toUpperCase(),
+                        'avg_price_give': avg_price,
+                        'quantity_give': quantity,
+                        'weight_rate_give': weight_rate,
+                    },
+                    success: function (response) { // 성공하면
+                        if (response["result"] == "success") {
+                            alert(response["msg"]);
+                            window.opener.location.reload(); // 전의 창(부모의 창 reload 하는 기능)
+                            window.close();
+                        }
+                    }
+                })
+            }
+
+
+            // $("#user_id").blur(function () {
+            //     // id = "id_reg" / name = "userId"
+            //     var user_id = $('#user_id').val();
+            //     $.ajax({
+            //         url: '${pageContext.request.contextPath}/user/idCheck?userId=' + user_id,
+            //         type: 'get',
+            //         success: function (data) {
+            //             console.log("1 = 중복o / 0 = 중복x : " + data);
+            //
+            //             if (data == 1) {
+            //                 // 1 : 아이디가 중복되는 문구
+            //                 $("#id_check").text("사용중인 아이디입니다 :p");
+            //                 $("#id_check").css("color", "red");
+            //                 $("#reg_submit").attr("disabled", true);
+            //             } else {
+            //
+            //                 if (idJ.test(user_id)) {
+            //                     // 0 : 아이디 길이 / 문자열 검사
+            //                     $("#id_check").text("");
+            //                     $("#reg_submit").attr("disabled", false);
+            //
+            //                 } else if (user_id == "") {
+            //
+            //                     $('#id_check').text('아이디를 입력해주세요 :)');
+            //                     $('#id_check').css('color', 'red');
+            //                     $("#reg_submit").attr("disabled", true);
+            //
+            //                 } else {
+            //
+            //                     $('#id_check').text("아이디는 소문자와 숫자 4~12자리만 가능합니다 :) :)");
+            //                     $('#id_check').css('color', 'red');
+            //                     $("#reg_submit").attr("disabled", true);
+            //                 }
+            //
+            //             }
+            //         }, error: function () {
+            //             console.log("실패");
+            //         }
+            //     });
+            // });
+
+
+
+        </script>
+
+    </head>
+<!--    <body onload="window.resizeTo(400,800)">-->
+    <body>
+        <h4>종목추가창</h4>
+
+        <div id="stock-box" class="form-post">
+            <form>
+                <div class="form-group">
+                    <label for="ticker">티커(Ticker)</label>
+                    <input type="text" class="form-control" id="ticker" placeholder="예시 ) AAPL, TSLA">
+                </div>
+
+
+<!--                &lt;!&ndash; 아이디 &ndash;&gt;-->
+<!--                <div class="form-group">-->
+<!--                    <label for="user_id">아이디</label>-->
+<!--                    <input type="text" class="form-control" id="user_id" name="user_id" placeholder="ID" required>-->
+<!--                    <div class="check_font" id="id_check"></div>-->
+<!--                </div>-->
+
+
+                <div class="form-group">
+                    <label for="avg_price">평균매수가($) </label>
+                    <input type="number" class="form-control" id="avg_price" placeholder="예시 ) 24.23">
+                </div>
+                <div class="form-group">
+                    <label for="quantity">수량 </label>
+                    <input type="number" class="form-control" id="quantity" placeholder="예시 ) 10, 0.1 ">
+                </div>
+                <div class="form-group">
+                    <label for="weight_rate">비중</label>
+                    <input type="text" class="form-control" id="weight_rate">
+                </div>
+
+            </form>
+        </div>
+
+        <button type="button" class="btn btn-primary" onclick="postStocks()">종목저장하기</button>
+        <button type="button" class="btn btn-secondary" onclick="self.close()">닫기</button>
+
+    </body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>USStock Dashboard</title>
+
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+                integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+                crossorigin="anonymous"></script>
+
+        <!-- import 대시보드 -->
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script>
+            google.charts.load('current', {
+                'packages': ['corechart']
+            });
+            google.charts.setOnLoadCallback(drawChart);
+
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable([
+                    ['Task', 'Hours per Day'],
+                    ['Work', 11],
+                    ['Eat', 2],
+                    ['Commute', 2],
+                    ['Watch TV', 2],
+                    ['Sleep', 7]
+                ]);
+                var options = {
+                    title: 'My Daily Activities'
+                };
+                var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+                chart.draw(data, options);
+            }
+        </script>
+
+        <script>
+            google.charts.load('current', {
+                'packages': ['corechart']
+            });
+            google.charts.setOnLoadCallback(drawChart2);
+
+            function drawChart2() {
+                var data = google.visualization.arrayToDataTable([
+                    ['Task', 'Hours per Day'],
+                    ['Work', 11],
+                    ['Eat', 2],
+                    ['Commute', 2],
+                    ['Watch TV', 2],
+                    ['Sleep', 7]
+                ]);
+                var options = {
+                    title: 'My Daily Activities'
+                };
+                var chart = new google.visualization.PieChart(document.getElementById('piechart2'));
+
+                chart.draw(data, options);
+            }
+        </script>
+
+
+    </head>
+
+    <body>
+        <button id="table" onclick="location.href='/portfolio'">
+            테이블로 보내기
+        </button>
+
+        <div id="piechart" style="width: 900px; height: 500px;"></div>
+        <div id="piechart2" style="width: 900px; height: 500px;"></div>
+
+        <span class="oi oi-pencil"></span>
+
+    </body>
+</html>

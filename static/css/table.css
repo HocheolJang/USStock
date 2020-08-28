@@ -1,0 +1,38 @@
+
+
+.wrap{
+    height: 100%;
+    width: 100%
+}
+
+#allofstocks {
+    text-align: center;
+}
+
+#edit_ticker, #delete_ticker {
+    margin: 0px 5px;
+}
+
+#summary, #summaryTitle, #dashboardTitle {
+    margin-top: 2em;
+}
+
+#summary {
+    margin-bottom: 2em;
+    width: 40%;
+    text-align: center;
+}
+
+#edit_ticker, #delete_ticker {
+    cursor: pointer;
+}
+
+.main-panel {
+    margin-left: 15em;
+    margin-right: 15em;
+}
+
+.portfolioTitle {
+    margin-left: 8em;
+    margin-top: 3em;
+}

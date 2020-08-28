@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+
+        <title>Portfolio | US Stock</title>
+
+        <!--CSS & Font-->
+        <link rel="stylesheet" type="text/css"
+              href="https://cdn.datatables.net/v/dt/dt-1.10.21/af-2.3.5/b-1.6.3/datatables.min.css"/>
+        <link rel="stylesheet" type="text/css"
+              href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"/>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+              integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+              crossorigin="anonymous">
+        <!--        <link href="../static/css/table.css" rel="stylesheet">-->
+
+        <!--Jquery-->
+        <!--제이쿼리 쓸 때는 무조건 제이쿼리 코드를 불러와야한다-->
+        <!--안될 때는 콘솔창에 왜 안되는지 코드 확인하기...에러 메세지 확인하고 하는게 맞다. 내마음대로 이것저것 바꾸지말고-->
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script type="text/javascript"
+                src="https://cdn.datatables.net/v/dt/dt-1.10.21/af-2.3.5/b-1.6.3/datatables.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+                crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+                integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+                crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+                integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+                crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+
+        <!--            기본데이터 불러온거지만 내가 CSS먹이면 이걸로 먹여진다-->
+        <style>
+
+
+            .wrap {
+                height: 100%;
+                width: 100%
+            }
+
+            #allofstocks {
+                text-align: center;
+            }
+
+            #edit_ticker, #delete_ticker {
+                margin: 0px 5px;
+            }
+
+            #summary, #summaryTitle, #dashboardTitle {
+                margin-top: 2em;
+            }
+
+            #summary {
+                margin-bottom: 2em;
+                width: 40%;
+                text-align: center;
+            }
+
+            #edit_ticker, #delete_ticker {
+                cursor: pointer;
+            }
+
+            .main-panel {
+                margin-left: 15em;
+                margin-right: 15em;
+            }
+
+            .portfolioTitle {
+                margin-left: 8em;
+                margin-top: 3em;
+            }
+
+        </style>
+
+    </head>
+
+    <body>
+        <div class="wrap">
+            <nav class="navbar navbar-dark bg-dark navbar-expand-lg fixed-top">
+                <a class="navbar-brand" href="#">Show Me the Money</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/#">Home</a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href="#">포트폴리오 <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#">관심종목</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#">배당현황</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#">배당일지</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#">매매일지</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="/login">로그인</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <h3 class="portfolioTitle">{닉네임}님의 미국주식은?</h3>
+
+
+            <div class="wrapper">
+                <div class="main-panel">
+                    <h4 id="dashboardTitle">대시보드</h4>
+                    <div class="dashboard">
+                        <div class="row">
+                            <div id="curve_chart" style="width: 600px; height: 400px"></div>
+                            <div id="chart_div" style="width: 600px; height: 400px"></div>
+                            <div id="chart_div2" style="width: 600px; height: 400px;"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div id="piechart" style="width: 500px; height: 400px;"></div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div id="piechart2" style="width: 500px; height: 400px;"></div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div id="piechart3" style="width: 500px; height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 id="summaryTitle">투자현황 요약</h4>
+                    <table class="table table-bordered" ID="summary">
+                        <thead>
+                        <tr>
+                            <th scope="col">손익</th>
+                            <th scope="col">평가액</th>
+                        </tr>
+                        </thead>
+                        <tbody id="summaryTable">
+                        <tr>
+                            <td class="sum_profit"></td>
+                            <td class="sum_evaluation"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+
+                    <table class="table" ID="allofstocks">
+                        <thead>
+                        <tr>
+                            <th scope="col">Ticker (티커)</th>
+                            <th scope="col">종목명</th>
+                            <th scope="col">섹터</th>
+                            <th scope="col">내용</th>
+                            <th scope="col">수익률</th>
+                            <th scope="col">손익</th>
+                            <th scope="col">평가금액</th>
+                            <th scope="col">평균매수액</th>
+                            <th scope="col">수량</th>
+                            <th scope="col">비중</th>
+                            <th scope="col">현재가</th>
+                            <th scope="col">수정/삭제</th>
+                        </tr>
+                        </thead>
+                        <tbody id="stockTable">
+                        <tr>
+                            <td>AAPL</td>
+                            <td>Apple Inc.</td>
+                            <td>IT</td>
+                            <td>소비재</td>
+                            <td>49.05%</td>
+                            <td>$907.540</td>
+                            <td>$2,757.780</td>
+                            <td>$308.373</td>
+                            <td>6</td>
+                            <td>4.2%</td>
+                            <td>$459.630</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="navbar fixed-bottom navbar-light bg-light">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a href="javascript:void(0)" class="nav-link">
+                            About Us
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="https://hocheoljang.github.io/" class="nav-link">
+                            Blog
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="https://github.com/HocheolJang" class="nav-link">
+                            Github
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="mailto:daaan0415@gmail.com" class="nav-link">
+                            문의사항
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+        </footer>
+        <!--        <script src="../static/js/table.js"></script>-->
+
+        <script>
+            $(document).ready(function () {
+                $("#stockTable").html("");
+                showStocks();
+            })
+
+            function loadStockInfo(symbol) {
+
+                // yahoo finance api 호출 때 쓰는 api
+
+                // var settings = {
+                //     "async": true,
+                //     "crossDomain": true,
+                //     "url": "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?region=US&symbol=" + symbol,
+                //     "method": "GET",
+                //     "headers": {
+                //         "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
+                //         "x-rapidapi-key": "037f6ad97dmshf9c85cd2a219335p1099b8jsna02252858f9f"
+                //     }
+                // }
+
+                // $.ajax(settings).done(function (response) {
+                //     console.log(response);
+                //     let row = $(`tr[data-ticker="${symbol}"]`)
+                //     row.find('.name').html(response.quoteType.shortName)
+                //     row.find('.now_price').html(response.price.regularMarketPrice.fmt)
+                //     // if (response.summaryProfile) {
+                //     row.find('.sector').html(response.summaryProfile.sector)
+                //     row.find('.desc').html(response.summaryProfile.industry)
+                //     // }
+                // calculate(symbol);
+                // })
+
+
+                // ALPHA VANTAGE finance api 호출 때 쓰는 api
+
+                // var settings = {
+                //     "async": true,
+                //     "crossDomain": true,
+                //     "url": "https://alpha-vantage.p.rapidapi.com/query?symbol=" + symbol + "&function=GLOBAL_QUOTE",
+                //     "method": "GET",
+                //     "headers": {
+                //         "x-rapidapi-host": "alpha-vantage.p.rapidapi.com",
+                //         "x-rapidapi-key": "037f6ad97dmshf9c85cd2a219335p1099b8jsna02252858f9f"
+                //     }
+                // }
+                // $.ajax(settings).done(function (response) {
+                //     console.log(response);
+                //     let row = $(`tr[data-ticker="${symbol}"]`)
+                //     row.find('.now_price').html(response['Global Quote']['05. price'])
+                // })
+                // // }
+                calculate(symbol);
+            }
+
+            function showStocks() {
+                $.ajax({
+                    type: "GET",
+                    url: "/api/readStocks",
+                    data: {},
+                    success: function (response) {
+                        if (response["result"] == "success") {
+                            let stocks = response['stocks'];
+                            for (let i = 0; i < stocks.length; i++) {
+                                stocks[i]['ticker'] = stocks[i]['ticker'].toUpperCase();
+                                makeStockRow(
+                                    stocks[i]['ticker'],
+                                    stocks[i]['name'],
+                                    stocks[i]['sector'],
+                                    stocks[i]['desc'],
+                                    stocks[i]['earning_rate'],
+                                    stocks[i]['profit'],
+                                    stocks[i]['evaluation'],
+                                    stocks[i]['avg_price'],
+                                    stocks[i]['quantity'],
+                                    stocks[i]['weight_rate']
+                                );
+
+                                loadStockInfo(stocks[i]['ticker'])
+                            }
+                        }
+
+                        $('#allofstocks').DataTable(
+                            {
+                                "paging": false,
+                                "order": [[4, "desc"]],
+                                "pagingType": "simple_numbers",
+                                "pagination": true,
+                                dom: 'Bfrtip',
+                                buttons: [
+                                    {
+                                        text: '종목추가',
+                                        action: function showPopup() {
+                                            var _width = '400';
+                                            var _height = '550';
+
+                                            // 팝업을 가운데 위치시키기 위해 아래와 같이 값 구하기
+                                            var _left = Math.ceil((window.screen.width - _width) / 2);
+                                            var _top = Math.ceil((window.screen.width - _height) / 5);
+
+                                            window.open("/addTicker", "popup_add_ticker", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
+                                        }
+
+                                    }
+                                ]
+                            }
+                        );
+                    }
+                })
+            }
+
+            function calculate(symbol) {
+                let now_price = $(`tr[data-ticker="${symbol}"] .now_price`).text();
+                let avg_price = $(`tr[data-ticker="${symbol}"] .avg_price`).text();
+                let quantity = $(`tr[data-ticker="${symbol}"] .quantity`).text();
+                let evaluation = (now_price * quantity).toFixed(2)
+                let profit = ((now_price - avg_price) * quantity).toFixed(2)
+                let earning_rate = ((profit / (avg_price * quantity)) * 100).toFixed(2) + "%"
+                // console.log(symbol, now_price, avg_price, quantity, evaluation, profit, earning_rate)
+                $(`tr[data-ticker="${symbol}"] .evaluation`).text(evaluation);
+                $(`tr[data-ticker="${symbol}"] .profit`).text(profit);
+                $(`tr[data-ticker="${symbol}"] .earning_rate`).text(earning_rate);
+
+            }
+
+
+            function makeStockRow(ticker, name, sector, desc, earning_rate, profit, evaluation, avg_price, quantity, weight_rate) {
+                let tempHtml = `<tr data-ticker="${ticker}">\
+                              <td class="ticker">${ticker}</td>
+                              <td class="name"></td>
+                              <td class="sector"></td>
+                              <td class="desc"></td>
+                              <td class="earning_rate"></td>
+                              <td class="profit"></td>
+                              <td class="evaluation"></td>
+                              <td class="avg_price">${avg_price}</td>
+                              <td class="quantity">${quantity}</td>
+                              <td class="weight_rate">${weight_rate}</td>
+                              <td class="now_price">100</td>
+                              <td>
+                              <img src="../static/img/pencil.svg" id="edit_ticker" onclick="popup_edit_ticker('${ticker}')">
+                              <img src="../static/img/trash.svg" id="delete_ticker" onclick="popup_delete_ticker('${ticker}')">
+                              </td>
+                            </tr>`;
+                $("#stockTable").append(tempHtml);
+            }
+
+            function popup_edit_ticker(ticker) {
+
+                var _width = '400';
+                var _height = '400';
+
+                var _left = Math.ceil((window.screen.width - _width) / 2);
+                var _top = Math.ceil((window.screen.width - _height) / 5);
+
+                window.open("/editTicker?ticker=" + ticker, "popup_edit_ticker", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
+
+            }
+
+            function popup_delete_ticker(ticker) {
+                if (confirm("정말 " + ticker + " 를 삭제하시겠습니까?") == true) {
+                    $.ajax({
+                        type: "DELETE",
+                        url: "/api/deleteStocks",
+                        data: {
+                            'ticker_delete': ticker
+                        },
+                        success: function (response) { // 성공하면
+                            if (response["result"] == "success") {
+                                alert(response["msg"]);
+                                window.close()
+                                window.location.reload(); // 전의 창(부모의 창 reload 하는 기능)
+                            } else {
+                                window.close()
+                            }
+                        }
+                    })
+                }
+            }
+
+
+            google.charts.load('current', {
+                'packages': ['corechart']
+            });
+            google.charts.setOnLoadCallback(drawChart);
+
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable([
+                    ['Task', 'Hours per Day'],
+                    ['Work', 11],
+                    ['Eat', 2],
+                    ['Commute', 2],
+                    ['Watch TV', 2],
+                    ['Sleep', 7]
+                ]);
+                var options = {
+                    title: '섹터별 비중',
+                    pieHole: 0.4
+                };
+                var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+                chart.draw(data, options);
+            }
+
+            google.charts.load('current', {
+                'packages': ['corechart']
+            });
+            google.charts.setOnLoadCallback(drawChart2);
+
+            function drawChart2() {
+                var data = google.visualization.arrayToDataTable([
+                    ['Task', 'Hours per Day'],
+                    ['Work', 11],
+                    ['Eat', 2],
+                    ['Commute', 2],
+                    ['Watch TV', 2],
+                    ['Sleep', 7]
+                ]);
+                var options = {
+                    title: '종목별 비중',
+                    legend: 'none',
+                    pieSliceText: 'label'
+                };
+                var chart = new google.visualization.PieChart(document.getElementById('piechart2'));
+
+                chart.draw(data, options);
+            }
+
+            google.charts.load('current', {
+                'packages': ['corechart']
+            });
+            google.charts.setOnLoadCallback(drawChart3);
+
+            function drawChart3() {
+                var data = google.visualization.arrayToDataTable([
+                    ['Task', 'Hours per Day'],
+                    ['Work', 11],
+                    ['Eat', 2],
+                    ['Commute', 2],
+                    ['Watch TV', 2],
+                    ['Sleep', 7]
+                ]);
+                var options = {
+                    title: 'FAMANG VS EX-FAMANG',
+                    legend: 'none'
+                };
+                var chart = new google.visualization.PieChart(document.getElementById('piechart3'));
+
+                chart.draw(data, options);
+            }
+
+            google.charts.load('current', {'packages': ['corechart']});
+            google.charts.setOnLoadCallback(drawChart4);
+
+            function drawChart4() {
+                var data = google.visualization.arrayToDataTable([
+                    ['Year', 'Sales', 'Expenses'],
+                    ['2004', 1000, 400],
+                    ['2005', 1170, 460],
+                    ['2006', 660, 1120],
+                    ['2007', 1030, 540]
+                ]);
+
+                var options = {
+                    title: 'Company Performance',
+                    curveType: 'function',
+                    legend: {position: 'bottom'}
+                };
+
+                var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+                chart.draw(data, options);
+            }
+
+            google.charts.load('current', {packages: ['corechart', 'line']});
+            google.charts.setOnLoadCallback(drawBasic);
+
+            function drawBasic() {
+
+                var data = new google.visualization.DataTable();
+                data.addColumn('number', 'X');
+                data.addColumn('number', 'Dogs');
+
+                data.addRows([
+                    [0, 0], [1, 10], [2, 23], [3, 17], [4, 18], [5, 9],
+                    [6, 11], [7, 27], [8, 33], [9, 40], [10, 32], [11, 35],
+                    [12, 30], [13, 40], [14, 42], [15, 47], [16, 44], [17, 48],
+                    [18, 52], [19, 54], [20, 42], [21, 55], [22, 56], [23, 57],
+                    [24, 60], [25, 50], [26, 52], [27, 51], [28, 49], [29, 53],
+                    [30, 55], [31, 60], [32, 61], [33, 59], [34, 62], [35, 65],
+                    [36, 62], [37, 58], [38, 55], [39, 61], [40, 64], [41, 65],
+                    [42, 63], [43, 66], [44, 67], [45, 69], [46, 69], [47, 70],
+                    [48, 72], [49, 68], [50, 66], [51, 65], [52, 67], [53, 70],
+                    [54, 71], [55, 72], [56, 73], [57, 75], [58, 70], [59, 68],
+                    [60, 64], [61, 60], [62, 65], [63, 67], [64, 68], [65, 69],
+                    [66, 70], [67, 72], [68, 75], [69, 80]
+                ]);
+
+                var options = {
+                    hAxis: {
+                        title: 'Time'
+                    },
+                    vAxis: {
+                        title: 'Popularity'
+                    }
+                };
+
+                var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+                chart.draw(data, options);
+            }
+
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawVisualization);
+
+      function drawVisualization() {
+        // Some raw data (not necessarily accurate)
+        var data = google.visualization.arrayToDataTable([
+          ['Month', 'Bolivia', 'Ecuador', 'Madagascar', 'Papua New Guinea', 'Rwanda', 'Average'],
+          ['2004/05',  165,      938,         522,             998,           450,      614.6],
+          ['2005/06',  135,      1120,        599,             1268,          288,      682],
+          ['2006/07',  157,      1167,        587,             807,           397,      623],
+          ['2007/08',  139,      1110,        615,             968,           215,      609.4],
+          ['2008/09',  136,      691,         629,             1026,          366,      569.6]
+        ]);
+
+        var options = {
+          title : 'Monthly Coffee Production by Country',
+          vAxis: {title: 'Cups'},
+          hAxis: {title: 'Month'},
+          seriesType: 'bars',
+          series: {5: {type: 'line'}}
+        };
+
+        var chart = new google.visualization.ComboChart(document.getElementById('chart_div2'));
+        chart.draw(data, options);
+      }
+
+
+
+            // function numberFormat(evaluation) {
+            //     return evaluation.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            // }
+
+
+            // 팝업을 가운데 위치시키기 위해 아래와 같이 값 구하기
+
+            //
+            // function AddComma(num) {
+            //     var regexp = /\B(?=(\d{3})+(?!\d))/g;
+            //     return num.toString().replace(regexp, ',');
+            // }
+            //
+            // var nData = AddComma(nData);
+            //
+            // // function change_color(){
+            // //     if(.earning_rate >= 0, style
+            // // )
+            // //
+            // //         }
+
+
+        </script>
+    </body>
+</html>
+
