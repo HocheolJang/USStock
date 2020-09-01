@@ -1,6 +1,8 @@
 from flask import Flask, render_template, jsonify, request
 from pymongo import MongoClient
 
+
+# from fixerio import Fixerio
 # from google.oauth2 import id_token
 # from google.auth.transport import requests
 
@@ -83,7 +85,15 @@ def delete_stocks():
     # 3. 성공하면 success 메시지를 반환합니다.
     return jsonify({'result': 'success', 'msg': ticker_receive + '가 정상적으로 삭제되었습니다'})
 
-
+# 환율
+#
+# fxrio = Fixerio(access_key='cbccf41f7daf20508f171349541a5091')
+# fxrio.latest()
+# '''
+# {u'base': u'USD',
+# u'date': u'2020-09-01',
+# u'rate':{u'KRW':
+# '''
 
 # Google Login 창
 

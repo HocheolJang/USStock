@@ -44,11 +44,10 @@ function loadStockInfo(symbol) {
     //     }
     // }
     // $.ajax(settings).done(function (response) {
-    //     console.log(response);
     //     let row = $(`tr[data-ticker="${symbol}"]`)
     //     row.find('.now_price').html(response['Global Quote']['05. price'])
     // })
-    // // }
+    // }
     calculate(symbol);
 }
 
@@ -66,10 +65,10 @@ function showStocks() {
                         stocks[i]['ticker'],
                         stocks[i]['name'],
                         stocks[i]['sector'],
-                        stocks[i]['desc'],
                         stocks[i]['earning_rate'],
                         stocks[i]['profit'],
                         stocks[i]['evaluation'],
+                        stocks[i]['investment'],
                         stocks[i]['avg_price'],
                         stocks[i]['quantity'],
                         stocks[i]['weight_rate']
@@ -79,12 +78,16 @@ function showStocks() {
                 }
             }
 
-            $('#allofstocks').DataTable(
+            var tabla = $('#allofstocks').DataTable(
                 {
                     "paging": false,
                     "order": [[4, "desc"]],
                     "pagingType": "simple_numbers",
                     "pagination": true,
+                    "language": {
+                        "decimal": ".",
+                        "thousands": ","
+                    },
                     dom: 'Bfrtip',
                     buttons: [
                         {
@@ -95,43 +98,112 @@ function showStocks() {
 
                                 // 팝업을 가운데 위치시키기 위해 아래와 같이 값 구하기
                                 var _left = Math.ceil((window.screen.width - _width) / 2);
-                                var _top = Math.ceil((window.screen.width - _height) / 2);
+                                var _top = Math.ceil((window.screen.width - _height) / 5);
 
                                 window.open("/addTicker", "popup_add_ticker", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
                             }
 
                         }
-                    ]
+                    ],
+                    "createdRow": function (row, data, index) {
+                        if (parseInt(data[4]) * 1 > 0) {
+                            $('td', row).eq(4).css({
+                                'color': 'red'
+                            })
+                        }
+                        if (parseInt(data[4]) < 0) {
+                            $('td', row).eq(4).css({
+                                'color': 'blue'
+                            })
+                        }
+                        if (parseFloat(data[3]) > 0) {
+                            $('td', row).eq(3).css({
+                                'color': 'red'
+                            })
+                        }
+                        if (parseFloat(data[3]) < 0) {
+                            $('td', row).eq(3).css({
+                                'color': 'blue'
+                            })
+                        }
+                    },
+                    "formatNumber": function (toFormat) {
+                        return toFormat.toString().replace(
+                            /\B(?=(\d{3})+(?!\d))/g, "'"
+                        );
+                    }
                 }
-            );
+            )
+            let tot_profit_usd = tabla.column(4).data().sum();
+            $("#sum_profit_usd").text(tot_profit_usd);
+
+            let tot_evaluation = tabla.column(5).data().sum();
+            $("#sum_evaluation").text(tot_evaluation);
+
+            let tot_investment = tabla.column(6).data().sum();
+            $("#sum_investment").text(tot_investment);
+
+            let tot_earning_rate = ((tot_profit_usd / tot_evaluation) * 100).toFixed(2) + "%"
+            $("#sum_earning_rate").text(tot_earning_rate)
+
+            let exchange = $("#exchange").text();
+            let tot_profit_krw = tot_profit_usd * exchange
+            $("sum_profit_krw").text(tot_profit_krw)
+
+            function changeColor1() {
+                if (tot_profit_usd > 0) {
+                    document.getElementById("sum_profit_usd").style.color = 'red';
+                } else {
+                    document.getElementById("sum_profit_usd").style.color = 'blue';
+                }
+            }
+
+            function changeColor2() {
+                if (parseFloat(tot_earning_rate) > 0) {
+                    document.getElementById("sum_earning_rate").style.color = 'red';
+                } else {
+                    document.getElementById("sum_earning_rate").style.color = 'blue';
+                }
+            }
+
+            changeColor1(), changeColor2(), showExchange()
+
         }
     })
 }
 
+
 function calculate(symbol) {
+
     let now_price = $(`tr[data-ticker="${symbol}"] .now_price`).text();
     let avg_price = $(`tr[data-ticker="${symbol}"] .avg_price`).text();
     let quantity = $(`tr[data-ticker="${symbol}"] .quantity`).text();
-    let evaluation = (now_price * quantity).toFixed(2)
-    let profit = ((now_price - avg_price) * quantity).toFixed(2)
-    let earning_rate = ((profit / (avg_price * quantity)) * 100).toFixed(2) + "%"
-    // console.log(symbol, now_price, avg_price, quantity, evaluation, profit, earning_rate)
+
+    let evaluation = (now_price * quantity).toFixed(2);
+    // let sum_evaluation = $("#sum_evaluation").text();
+    // console.log(sum_evaluation)
+    let investment = (avg_price * quantity).toFixed(2);
+    let profit = ((now_price - avg_price) * quantity).toFixed(2);
+    let earning_rate = ((profit / (avg_price * quantity)) * 100).toFixed(2) + "%";
+    // let weight_rate = evaluation / sum_evaluation;
+
     $(`tr[data-ticker="${symbol}"] .evaluation`).text(evaluation);
     $(`tr[data-ticker="${symbol}"] .profit`).text(profit);
     $(`tr[data-ticker="${symbol}"] .earning_rate`).text(earning_rate);
+    $(`tr[data-ticker="${symbol}"] .investment`).text(investment);
+    // $(`tr[data-ticker="${symbol}"] .weight_rate`).text(weight_rate);
 
 }
 
-
-function makeStockRow(ticker, name, sector, desc, earning_rate, profit, evaluation, avg_price, quantity, weight_rate) {
+function makeStockRow(ticker, name, sector, earning_rate, profit, evaluation, investment, avg_price, quantity, weight_rate) {
     let tempHtml = `<tr data-ticker="${ticker}">\
                               <td class="ticker">${ticker}</td>
                               <td class="name"></td>
                               <td class="sector"></td>
-                              <td class="desc"></td>
                               <td class="earning_rate"></td>
                               <td class="profit"></td>
                               <td class="evaluation"></td>
+                              <td class="investment"></td>
                               <td class="avg_price">${avg_price}</td>
                               <td class="quantity">${quantity}</td>
                               <td class="weight_rate">${weight_rate}</td>
@@ -150,7 +222,7 @@ function popup_edit_ticker(ticker) {
     var _height = '400';
 
     var _left = Math.ceil((window.screen.width - _width) / 2);
-    var _top = Math.ceil((window.screen.width - _height) / 2);
+    var _top = Math.ceil((window.screen.width - _height) / 5);
 
     window.open("/editTicker?ticker=" + ticker, "popup_edit_ticker", 'width=' + _width + ', height=' + _height + ', left=' + _left + ', top=' + _top);
 
@@ -193,8 +265,14 @@ function drawChart() {
         ['Sleep', 7]
     ]);
     var options = {
+        pieHole: 0.4,
         title: '섹터별 비중',
-        pieHole: 0.4
+        titleTextStyle: {
+            bold: true,
+            fontSize: 20
+        },
+        pieSliceText: 'label',
+        sliceVisibilityThreshold: .05
     };
     var chart = new google.visualization.PieChart(document.getElementById('piechart'));
 
@@ -218,7 +296,12 @@ function drawChart2() {
     var options = {
         title: '종목별 비중',
         legend: 'none',
-        pieSliceText: 'label'
+        pieSliceText: 'label',
+        titleTextStyle: {
+            bold: true,
+            fontSize: 20
+        },
+        sliceVisibilityThreshold: .05
     };
     var chart = new google.visualization.PieChart(document.getElementById('piechart2'));
 
@@ -241,7 +324,11 @@ function drawChart3() {
     ]);
     var options = {
         title: 'FAMANG VS EX-FAMANG',
-        legend: 'none'
+        legend: 'none',
+        titleTextStyle: {
+            bold: true,
+            fontSize: 20
+        }
     };
     var chart = new google.visualization.PieChart(document.getElementById('piechart3'));
 
@@ -249,9 +336,9 @@ function drawChart3() {
 }
 
 google.charts.load('current', {'packages': ['corechart']});
-google.charts.setOnLoadCallback(drawChart);
+google.charts.setOnLoadCallback(drawChart4);
 
-function drawChart() {
+function drawChart4() {
     var data = google.visualization.arrayToDataTable([
         ['Year', 'Sales', 'Expenses'],
         ['2004', 1000, 400],
@@ -262,6 +349,10 @@ function drawChart() {
 
     var options = {
         title: 'Company Performance',
+        titleTextStyle: {
+            bold: true,
+            fontSize: 20
+        },
         curveType: 'function',
         legend: {position: 'bottom'}
     };
@@ -276,13 +367,13 @@ google.charts.setOnLoadCallback(drawBasic);
 
 function drawBasic() {
 
-      var data = new google.visualization.DataTable();
-      data.addColumn('number', 'X');
-      data.addColumn('number', 'Dogs');
+    var data = new google.visualization.DataTable();
+    data.addColumn('number', 'X');
+    data.addColumn('number', 'Dogs');
 
-      data.addRows([
-        [0, 0],   [1, 10],  [2, 23],  [3, 17],  [4, 18],  [5, 9],
-        [6, 11],  [7, 27],  [8, 33],  [9, 40],  [10, 32], [11, 35],
+    data.addRows([
+        [0, 0], [1, 10], [2, 23], [3, 17], [4, 18], [5, 9],
+        [6, 11], [7, 27], [8, 33], [9, 40], [10, 32], [11, 35],
         [12, 30], [13, 40], [14, 42], [15, 47], [16, 44], [17, 48],
         [18, 52], [19, 54], [20, 42], [21, 55], [22, 56], [23, 57],
         [24, 60], [25, 50], [26, 52], [27, 51], [28, 49], [29, 53],
@@ -293,41 +384,107 @@ function drawBasic() {
         [54, 71], [55, 72], [56, 73], [57, 75], [58, 70], [59, 68],
         [60, 64], [61, 60], [62, 65], [63, 67], [64, 68], [65, 69],
         [66, 70], [67, 72], [68, 75], [69, 80]
-      ]);
+    ]);
 
-      var options = {
+    var options = {
         hAxis: {
-          title: 'Time'
+            title: 'Time'
         },
         vAxis: {
-          title: 'Popularity'
+            title: 'Popularity'
+        },
+        title: '일별수익률',
+        titleTextStyle: {
+            bold: true,
+            fontSize: 20
         }
-      };
+    };
 
-      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
 
-      chart.draw(data, options);
-    }
+    chart.draw(data, options);
+}
+
+google.charts.load('current', {'packages': ['corechart']});
+google.charts.setOnLoadCallback(drawVisualization);
+
+function drawVisualization() {
+    // Some raw data (not necessarily accurate)
+    var data = google.visualization.arrayToDataTable([
+        ['Month', 'Bolivia', 'Ecuador', 'Madagascar', 'Papua New Guinea', 'Rwanda', 'Average'],
+        ['2004/05', 165, 938, 522, 998, 450, 614.6],
+        ['2005/06', 135, 1120, 599, 1268, 288, 682],
+        ['2006/07', 157, 1167, 587, 807, 397, 623],
+        ['2007/08', 139, 1110, 615, 968, 215, 609.4],
+        ['2008/09', 136, 691, 629, 1026, 366, 569.6]
+    ]);
+
+    var options = {
+        title: 'Monthly Coffee Production by Country',
+        titleTextStyle: {
+            bold: true,
+            fontSize: 20
+        },
+        vAxis: {title: 'Cups'},
+        hAxis: {title: 'Month'},
+        seriesType: 'bars',
+        series: {5: {type: 'line'}}
+    };
+
+    var chart = new google.visualization.ComboChart(document.getElementById('chart_div2'));
+    chart.draw(data, options);
+}
+
+function rate() {
+    var test1 = $('td', "sum_profit").text();
+    var test2 = $('td', "sum_investment").html();
+    console.log(test1, test2)
+    // let sum_earning_rate = (sum_profit / sum_investment
+    // $("#sum_earning_rate").text(sum_earning_rate)
+}
+
+function showExchange() {
+    $.ajax({
+        type: "GET",
+        url: "https://api.manana.kr/exchange/rate.json",
+        data: {},
+        success: function (response) {
+            for (let i = 0; i < response.length; i++) {
+                if (response[i]['name'] == 'USDKRW=X') {
+                    $('#exchange').text(response[i]['rate']);
+                    return;
+
+                }
+            }
+        }
+    })
+}
 
 
-// function numberFormat(evaluation) {
-//     return evaluation.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+// function currency_rate() {
+//     // set endpoint and your API key
+//     endpoint = 'convert';
+//     access_key = 'cbccf41f7daf20508f171349541a5091';
+//
+//     // define from currency, to currency, and amount
+//     from = 'USD';
+//     to = 'KRW';
+//     amount = '1';
+//
+//     // execute the conversion using the "convert" endpoint:
+//     $.ajax({
+//         type: 'GET',
+//         url: 'http://data.fixer.io/api/' + endpoint + '?access_key=' + access_key + '&from=' + from + '&to=' + to + '&amount=' + amount,
+//         dataType: 'jsonp',
+//         success: function (json) {
+//
+//             // access the conversion result in json.result
+//             // console.log(result);
+//             alert(json.result);
+//         },
+//         error: function (x, e) {
+//             console.log(e);
+//         } // must be function, not implicit call
+//     });
 // }
-
-
-// 팝업을 가운데 위치시키기 위해 아래와 같이 값 구하기
-
-//
-// function AddComma(num) {
-//     var regexp = /\B(?=(\d{3})+(?!\d))/g;
-//     return num.toString().replace(regexp, ',');
-// }
-//
-// var nData = AddComma(nData);
-//
-// // function change_color(){
-// //     if(.earning_rate >= 0, style
-// // )
-// //
-// //         }
 
