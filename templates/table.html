@@ -32,6 +32,7 @@
                 integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
                 crossorigin="anonymous"></script>
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="http://cdn.datatables.net/plug-ins/1.10.21/api/sum().js"></script>
 
 
         <!--            기본데이터 불러온거지만 내가 CSS먹이면 이걸로 먹여진다-->
@@ -74,7 +75,8 @@
                 margin-left: 8em;
                 margin-top: 3em;
             }
-            .wrap{
+
+            .wrap {
                 margin-bottom: 10em;
             }
 
@@ -129,13 +131,13 @@
                     <h4 id="dashboardTitle">대시보드</h4>
                     <div class="dashboard">
                         <div class="row">
-                            <div id="curve_chart" style="width: 600px; height: 400px"></div>
-                            <div id="chart_div" style="width: 600px; height: 400px"></div>
-                            <div id="chart_div2" style="width: 600px; height: 400px;"></div>
+                            <div id="curve_chart" style="width: 650px; height: 400px"></div>
+                            <div id="chart_div" style="width: 650px; height: 400px"></div>
+                            <div id="chart_div2" style="width: 650px; height: 400px;"></div>
                         </div>
                         <div class="row">
                             <div class="col-lg-4">
-                                <div id="piechart" style="width: 500px; height: 400px;"></div>
+                                <div id="piechart" style="width: 500px; height: 400px; align-items: center;"></div>
                             </div>
                             <div class="col-lg-4">
                                 <div id="piechart2" style="width: 500px; height: 400px;"></div>
@@ -150,52 +152,59 @@
                     <table class="table table-bordered" ID="summary">
                         <thead>
                         <tr>
-                            <th scope="col">손익</th>
-                            <th scope="col">평가액</th>
+                            <th scope="col" class="sum_earning_rate">수익률</th>
+                            <th scope="col" class="sum_profit">손익</th>
+                            <th scope="col" class="sum_evaluation">평가액</th>
+                            <th scope="col" class="sum_investment">투자금</th>
                         </tr>
                         </thead>
                         <tbody id="summaryTable">
                         <tr>
-                            <td class="sum_profit"></td>
-                            <td class="sum_evaluation"></td>
+                            <td id="sum_earning_rate"></td>
+                            <td id="sum_profit"></td>
+                            <td id="sum_evaluation"></td>
+                            <td id="sum_investment"></td>
                         </tr>
                         </tbody>
                     </table>
 
-
-                    <table class="table" ID="allofstocks">
-                        <thead>
-                        <tr>
-                            <th scope="col">Ticker (티커)</th>
-                            <th scope="col">종목명</th>
-                            <th scope="col">섹터</th>
-                            <th scope="col">내용</th>
-                            <th scope="col">수익률</th>
-                            <th scope="col">손익</th>
-                            <th scope="col">평가금액</th>
-                            <th scope="col">평균매수액</th>
-                            <th scope="col">수량</th>
-                            <th scope="col">비중</th>
-                            <th scope="col">현재가</th>
-                            <th scope="col">수정/삭제</th>
-                        </tr>
-                        </thead>
-                        <tbody id="stockTable">
-                        <tr>
-                            <td>AAPL</td>
-                            <td>Apple Inc.</td>
-                            <td>IT</td>
-                            <td>소비재</td>
-                            <td>49.05%</td>
-                            <td>$907.540</td>
-                            <td>$2,757.780</td>
-                            <td>$308.373</td>
-                            <td>6</td>
-                            <td>4.2%</td>
-                            <td>$459.630</td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <div class="row">
+                        <div class="col">
+                            <table class="table" ID="allofstocks">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Ticker (티커)</th>
+                                    <th scope="col">종목명</th>
+                                    <th scope="col">섹터</th>
+                                    <th scope="col">수익률</th>
+                                    <th scope="col">손익</th>
+                                    <th scope="col">평가액</th>
+                                    <th scope="col">투자금</th>
+                                    <th scope="col">평균매수액</th>
+                                    <th scope="col">수량</th>
+                                    <th scope="col">비중</th>
+                                    <th scope="col">현재가</th>
+                                    <th scope="col">수정/삭제</th>
+                                </tr>
+                                </thead>
+                                <tbody id="stockTable">
+                                <tr>
+                                    <td>AAPL</td>
+                                    <td>Apple Inc.</td>
+                                    <td>IT</td>
+                                    <td>49.05%</td>
+                                    <td>$907.540</td>
+                                    <td>$2,757.780</td>
+                                    <td>$1,857.780</td>
+                                    <td>$308.373</td>
+                                    <td>6</td>
+                                    <td>4.2%</td>
+                                    <td>$459.630</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -298,10 +307,10 @@
                                     stocks[i]['ticker'],
                                     stocks[i]['name'],
                                     stocks[i]['sector'],
-                                    stocks[i]['desc'],
                                     stocks[i]['earning_rate'],
                                     stocks[i]['profit'],
                                     stocks[i]['evaluation'],
+                                    stocks[i]['investment'],
                                     stocks[i]['avg_price'],
                                     stocks[i]['quantity'],
                                     stocks[i]['weight_rate']
@@ -311,12 +320,16 @@
                             }
                         }
 
-                        $('#allofstocks').DataTable(
+                        var tabla = $('#allofstocks').DataTable(
                             {
                                 "paging": false,
                                 "order": [[4, "desc"]],
                                 "pagingType": "simple_numbers",
                                 "pagination": true,
+                                "language": {
+                                    "decimal": ".",
+                                    "thousands": ","
+                                },
                                 dom: 'Bfrtip',
                                 buttons: [
                                     {
@@ -333,37 +346,101 @@
                                         }
 
                                     }
-                                ]
+                                ],
+                                "createdRow": function (row, data, index) {
+                                    if (parseInt(data[4]) * 1 > 0) {
+                                        $('td', row).eq(4).css({
+                                            'color': 'red'
+                                        })
+                                    }
+                                    if (parseInt(data[4]) < 0) {
+                                        $('td', row).eq(4).css({
+                                            'color': 'blue'
+                                        })
+                                    }
+                                    if (parseFloat(data[3]) > 0) {
+                                        $('td', row).eq(3).css({
+                                            'color': 'red'
+                                        })
+                                    }
+                                    if (parseFloat(data[3]) < 0) {
+                                        $('td', row).eq(3).css({
+                                            'color': 'blue'
+                                        })
+                                    }
+                                },
+                                "formatNumber": function (toFormat) {
+                                    return toFormat.toString().replace(
+                                        /\B(?=(\d{3})+(?!\d))/g, "'"
+                                    );
+                                }
                             }
-                        );
+                        )
+                        let tot_profit = tabla.column(4).data().sum();
+                        $("#sum_profit").text(tot_profit);
+
+                        let tot_evaluation = tabla.column(5).data().sum();
+                        $("#sum_evaluation").text(tot_evaluation);
+
+                        let tot_investment = tabla.column(6).data().sum();
+                        $("#sum_investment").text(tot_investment);
+
+                        let tot_earning_rate = ((tot_profit / tot_evaluation) * 100).toFixed(2) + "%"
+                        $("#sum_earning_rate").text(tot_earning_rate)
+
+                        function changeColor1() {
+                            if (tot_profit > 0) {
+                                document.getElementById("sum_profit").style.color = 'red';
+                            } else {
+                                document.getElementById("sum_profit").style.color = 'blue';
+                            }
+                        }
+
+                        function changeColor2() {
+                            if (parseFloat(tot_earning_rate) > 0) {
+                                document.getElementById("sum_earning_rate").style.color = 'red';
+                            } else {
+                                document.getElementById("sum_earning_rate").style.color = 'blue';
+                            }
+                        }
+
+                        changeColor1(), changeColor2()
+
                     }
                 })
             }
 
+
             function calculate(symbol) {
+
                 let now_price = $(`tr[data-ticker="${symbol}"] .now_price`).text();
                 let avg_price = $(`tr[data-ticker="${symbol}"] .avg_price`).text();
                 let quantity = $(`tr[data-ticker="${symbol}"] .quantity`).text();
-                let evaluation = (now_price * quantity).toFixed(2)
-                let profit = ((now_price - avg_price) * quantity).toFixed(2)
-                let earning_rate = ((profit / (avg_price * quantity)) * 100).toFixed(2) + "%"
-                // console.log(symbol, now_price, avg_price, quantity, evaluation, profit, earning_rate)
+
+                let evaluation = (now_price * quantity).toFixed(2);
+                let sum_evaluation = $("#sum_evaluation").text();
+                let investment = (avg_price * quantity).toFixed(2);
+                let profit = ((now_price - avg_price) * quantity).toFixed(2);
+                let earning_rate = ((profit / (avg_price * quantity)) * 100).toFixed(2) + "%";
+                let weight_rate = evaluation / sum_evaluation;
+
                 $(`tr[data-ticker="${symbol}"] .evaluation`).text(evaluation);
                 $(`tr[data-ticker="${symbol}"] .profit`).text(profit);
                 $(`tr[data-ticker="${symbol}"] .earning_rate`).text(earning_rate);
+                $(`tr[data-ticker="${symbol}"] .investment`).text(investment);
+                $(`tr[data-ticker="${symbol}"] .weight_rate`).text(weight_rate);
 
             }
 
-
-            function makeStockRow(ticker, name, sector, desc, earning_rate, profit, evaluation, avg_price, quantity, weight_rate) {
+            function makeStockRow(ticker, name, sector, earning_rate, profit, evaluation, investment, avg_price, quantity, weight_rate) {
                 let tempHtml = `<tr data-ticker="${ticker}">\
                               <td class="ticker">${ticker}</td>
                               <td class="name"></td>
                               <td class="sector"></td>
-                              <td class="desc"></td>
                               <td class="earning_rate"></td>
                               <td class="profit"></td>
                               <td class="evaluation"></td>
+                              <td class="investment"></td>
                               <td class="avg_price">${avg_price}</td>
                               <td class="quantity">${quantity}</td>
                               <td class="weight_rate">${weight_rate}</td>
@@ -425,8 +502,14 @@
                     ['Sleep', 7]
                 ]);
                 var options = {
+                    pieHole: 0.4,
                     title: '섹터별 비중',
-                    pieHole: 0.4
+                    titleTextStyle: {
+                        bold: true,
+                        fontSize: 20
+                    },
+                    pieSliceText: 'label',
+                    sliceVisibilityThreshold: .05
                 };
                 var chart = new google.visualization.PieChart(document.getElementById('piechart'));
 
@@ -450,7 +533,12 @@
                 var options = {
                     title: '종목별 비중',
                     legend: 'none',
-                    pieSliceText: 'label'
+                    pieSliceText: 'label',
+                    titleTextStyle: {
+                        bold: true,
+                        fontSize: 20
+                    },
+                    sliceVisibilityThreshold: .05
                 };
                 var chart = new google.visualization.PieChart(document.getElementById('piechart2'));
 
@@ -473,7 +561,11 @@
                 ]);
                 var options = {
                     title: 'FAMANG VS EX-FAMANG',
-                    legend: 'none'
+                    legend: 'none',
+                    titleTextStyle: {
+                        bold: true,
+                        fontSize: 20
+                    }
                 };
                 var chart = new google.visualization.PieChart(document.getElementById('piechart3'));
 
@@ -494,6 +586,10 @@
 
                 var options = {
                     title: 'Company Performance',
+                    titleTextStyle: {
+                        bold: true,
+                        fontSize: 20
+                    },
                     curveType: 'function',
                     legend: {position: 'bottom'}
                 };
@@ -533,6 +629,11 @@
                     },
                     vAxis: {
                         title: 'Popularity'
+                    },
+                    title: '일별수익률',
+                    titleTextStyle: {
+                        bold: true,
+                        fontSize: 20
                     }
                 };
 
@@ -541,54 +642,43 @@
                 chart.draw(data, options);
             }
 
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawVisualization);
+            google.charts.load('current', {'packages': ['corechart']});
+            google.charts.setOnLoadCallback(drawVisualization);
 
-      function drawVisualization() {
-        // Some raw data (not necessarily accurate)
-        var data = google.visualization.arrayToDataTable([
-          ['Month', 'Bolivia', 'Ecuador', 'Madagascar', 'Papua New Guinea', 'Rwanda', 'Average'],
-          ['2004/05',  165,      938,         522,             998,           450,      614.6],
-          ['2005/06',  135,      1120,        599,             1268,          288,      682],
-          ['2006/07',  157,      1167,        587,             807,           397,      623],
-          ['2007/08',  139,      1110,        615,             968,           215,      609.4],
-          ['2008/09',  136,      691,         629,             1026,          366,      569.6]
-        ]);
+            function drawVisualization() {
+                // Some raw data (not necessarily accurate)
+                var data = google.visualization.arrayToDataTable([
+                    ['Month', 'Bolivia', 'Ecuador', 'Madagascar', 'Papua New Guinea', 'Rwanda', 'Average'],
+                    ['2004/05', 165, 938, 522, 998, 450, 614.6],
+                    ['2005/06', 135, 1120, 599, 1268, 288, 682],
+                    ['2006/07', 157, 1167, 587, 807, 397, 623],
+                    ['2007/08', 139, 1110, 615, 968, 215, 609.4],
+                    ['2008/09', 136, 691, 629, 1026, 366, 569.6]
+                ]);
 
-        var options = {
-          title : 'Monthly Coffee Production by Country',
-          vAxis: {title: 'Cups'},
-          hAxis: {title: 'Month'},
-          seriesType: 'bars',
-          series: {5: {type: 'line'}}
-        };
+                var options = {
+                    title: 'Monthly Coffee Production by Country',
+                    titleTextStyle: {
+                        bold: true,
+                        fontSize: 20
+                    },
+                    vAxis: {title: 'Cups'},
+                    hAxis: {title: 'Month'},
+                    seriesType: 'bars',
+                    series: {5: {type: 'line'}}
+                };
 
-        var chart = new google.visualization.ComboChart(document.getElementById('chart_div2'));
-        chart.draw(data, options);
-      }
+                var chart = new google.visualization.ComboChart(document.getElementById('chart_div2'));
+                chart.draw(data, options);
+            }
 
-
-
-            // function numberFormat(evaluation) {
-            //     return evaluation.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            // }
-
-
-            // 팝업을 가운데 위치시키기 위해 아래와 같이 값 구하기
-
-            //
-            // function AddComma(num) {
-            //     var regexp = /\B(?=(\d{3})+(?!\d))/g;
-            //     return num.toString().replace(regexp, ',');
-            // }
-            //
-            // var nData = AddComma(nData);
-            //
-            // // function change_color(){
-            // //     if(.earning_rate >= 0, style
-            // // )
-            // //
-            // //         }
+            function rate() {
+                var test1 = $('td', "sum_profit").text();
+                var test2 = $('td', "sum_investment").html();
+                console.log(test1, test2)
+                // let sum_earning_rate = (sum_profit / sum_investment
+                // $("#sum_earning_rate").text(sum_earning_rate)
+            }
 
 
         </script>
