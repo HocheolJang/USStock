@@ -78,7 +78,7 @@ function showStocks() {
                 }
             }
 
-            var tabla = $('#allofstocks').DataTable(
+            let table = $('#allofstocks').DataTable(
                 {
                     "paging": false,
                     "order": [[4, "desc"]],
@@ -134,13 +134,13 @@ function showStocks() {
                     }
                 }
             )
-            let tot_profit_usd = tabla.column(4).data().sum();
+            let tot_profit_usd = table.column(4).data().sum();
             $("#sum_profit_usd").text(tot_profit_usd);
 
-            let tot_evaluation = tabla.column(5).data().sum();
+            let tot_evaluation = table.column(5).data().sum();
             $("#sum_evaluation").text(tot_evaluation);
 
-            let tot_investment = tabla.column(6).data().sum();
+            let tot_investment = table.column(6).data().sum();
             $("#sum_investment").text(tot_investment);
 
             let tot_earning_rate = ((tot_profit_usd / tot_evaluation) * 100).toFixed(2) + "%"
@@ -459,32 +459,4 @@ function showExchange() {
         }
     })
 }
-
-
-// function currency_rate() {
-//     // set endpoint and your API key
-//     endpoint = 'convert';
-//     access_key = 'cbccf41f7daf20508f171349541a5091';
-//
-//     // define from currency, to currency, and amount
-//     from = 'USD';
-//     to = 'KRW';
-//     amount = '1';
-//
-//     // execute the conversion using the "convert" endpoint:
-//     $.ajax({
-//         type: 'GET',
-//         url: 'http://data.fixer.io/api/' + endpoint + '?access_key=' + access_key + '&from=' + from + '&to=' + to + '&amount=' + amount,
-//         dataType: 'jsonp',
-//         success: function (json) {
-//
-//             // access the conversion result in json.result
-//             // console.log(result);
-//             alert(json.result);
-//         },
-//         error: function (x, e) {
-//             console.log(e);
-//         } // must be function, not implicit call
-//     });
-// }
 
