@@ -2,26 +2,77 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="google-signin-client_id"
-              content="380546081767-4g36veq7eenvnit3c5tbagihrbbh9ba3.apps.googleusercontent.com">
-        <title>Title</title>
 
+        <!--        &lt;!&ndash;Google SignIn&ndash;&gt;-->
+        <!--        <meta name="google-signin-client_id"-->
+        <!--              content="818472002702-opbmg8r9mbkg971qtopkpncckb3p97e9.apps.googleusercontent.com">-->
 
-        <script src="https://apis.google.com/js/platform.js" async defer></script>
+        <title>로그인 | ShowMeTheMoney</title>
+
+        <script>
+            function checkLoginStatus() {
+                var loginBtn = document.querySelector('#loginBtn');
+                var nameTxt = document.querySelector('#name');
+                if (gauth.isSignedIn.get()) {
+                    console.log('logined');
+                    loginBtn.value = 'Logout';
+                    var profile = gauth.currentUser.get().getBasicProfile();
+                    console.log(profile.getName());
+                    nameTxt.innerHTML = 'Welcome <strong>' + profile.getName()+'</strong>';
+                } else {
+                    console.log('logouted');
+                    loginBtn.value = 'Login';
+                    nameTxt.innerHTML = '';
+                }
+            }
+
+            function init() {
+                console.log('init');
+                gapi.load('auth2', function () {
+                    console.log('auth2');
+                    window.gauth = gapi.auth2.init({
+                        client_id: '818472002702-opbmg8r9mbkg971qtopkpncckb3p97e9.apps.googleusercontent.com'
+                    })
+                    gauth.then(function () {
+                        console.log('googleAuth success');
+                        checkLoginStatus();
+                    }, function () {
+                        console.log('googleAuth fail');
+                    });
+                })
+            }
+
+        </script>
+
     </head>
     <body>
 
-        <div class="g-signin2" data-onsuccess="onSignIn">
-            <button>구글 로그인</button>
-        </div>
-        <script>
-            function onSignIn(googleUser) {
-                var profile = googleUser.getBasicProfile();
-                console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-                console.log('Name: ' + profile.getName());
-                console.log('Image URL: ' + profile.getImageUrl());
-                console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-            }
-        </script>
+        <!--        <div class="g-signin2" data-onsuccess="onSignIn"></div>-->
+
+        <span id="name"></span>
+        <input type="button" id="loginBtn" value="checking..." onclick="
+            if(this.value === 'Login'){
+                 gauth.signIn().then(function(){
+                  console.log('gauth.signIn()');
+                  checkLoginStatus();
+                 });
+            } else {
+                 gauth.signOut().then(function(){
+                 console.log('gauth.signOut()');
+                  checkLoginStatus();
+                   });
+                  }
+        ">
+
+                <script src="https://apis.google.com/js/platform.js?onload=init"
+                async
+                defer></script>
+
     </body>
+
+
+        <!--        .then이라고 하고 다시 함수를 호출하면 이 작업이 끝나면 다음 부를 함수 -->
+
+
+
 </html>

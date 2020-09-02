@@ -3,53 +3,7 @@ $(document).ready(function () {
     showStocks();
 })
 
-function loadStockInfo(symbol) {
-
-    // yahoo finance api 호출 때 쓰는 api
-
-    // var settings = {
-    //     "async": true,
-    //     "crossDomain": true,
-    //     "url": "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?region=US&symbol=" + symbol,
-    //     "method": "GET",
-    //     "headers": {
-    //         "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
-    //         "x-rapidapi-key": "037f6ad97dmshf9c85cd2a219335p1099b8jsna02252858f9f"
-    //     }
-    // }
-
-    // $.ajax(settings).done(function (response) {
-    //     console.log(response);
-    //     let row = $(`tr[data-ticker="${symbol}"]`)
-    //     row.find('.name').html(response.quoteType.shortName)
-    //     row.find('.now_price').html(response.price.regularMarketPrice.fmt)
-    //     // if (response.summaryProfile) {
-    //     row.find('.sector').html(response.summaryProfile.sector)
-    //     row.find('.desc').html(response.summaryProfile.industry)
-    //     // }
-    // calculate(symbol);
-    // })
-
-
-    // ALPHA VANTAGE finance api 호출 때 쓰는 api
-
-    // var settings = {
-    //     "async": true,
-    //     "crossDomain": true,
-    //     "url": "https://alpha-vantage.p.rapidapi.com/query?symbol=" + symbol + "&function=GLOBAL_QUOTE",
-    //     "method": "GET",
-    //     "headers": {
-    //         "x-rapidapi-host": "alpha-vantage.p.rapidapi.com",
-    //         "x-rapidapi-key": "037f6ad97dmshf9c85cd2a219335p1099b8jsna02252858f9f"
-    //     }
-    // }
-    // $.ajax(settings).done(function (response) {
-    //     let row = $(`tr[data-ticker="${symbol}"]`)
-    //     row.find('.now_price').html(response['Global Quote']['05. price'])
-    // })
-    // }
-    calculate(symbol);
-}
+let sum_eval = 0;
 
 function showStocks() {
     $.ajax({
@@ -60,6 +14,7 @@ function showStocks() {
             if (response["result"] == "success") {
                 let stocks = response['stocks'];
                 for (let i = 0; i < stocks.length; i++) {
+                    sum_eval += stocks[i]['evaluation'];
                     stocks[i]['ticker'] = stocks[i]['ticker'].toUpperCase();
                     makeStockRow(
                         stocks[i]['ticker'],
@@ -74,7 +29,7 @@ function showStocks() {
                         stocks[i]['weight_rate']
                     );
 
-                    loadStockInfo(stocks[i]['ticker'])
+                    loadStockInfo(stocks[i]['ticker'], sum_eval)
                 }
             }
 
@@ -146,10 +101,6 @@ function showStocks() {
             let tot_earning_rate = ((tot_profit_usd / tot_evaluation) * 100).toFixed(2) + "%"
             $("#sum_earning_rate").text(tot_earning_rate)
 
-            let exchange = $("#exchange").text();
-            let tot_profit_krw = tot_profit_usd * exchange
-            $("sum_profit_krw").text(tot_profit_krw)
-
             function changeColor1() {
                 if (tot_profit_usd > 0) {
                     document.getElementById("sum_profit_usd").style.color = 'red';
@@ -172,28 +123,71 @@ function showStocks() {
     })
 }
 
+function loadStockInfo(symbol) {
+
+    // yahoo finance api 호출 때 쓰는 api
+
+    // var settings = {
+    //     "async": true,
+    //     "crossDomain": true,
+    //     "url": "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?region=US&symbol=" + symbol,
+    //     "method": "GET",
+    //     "headers": {
+    //         "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
+    //         "x-rapidapi-key": "037f6ad97dmshf9c85cd2a219335p1099b8jsna02252858f9f"
+    //     }
+    // }
+
+    // $.ajax(settings).done(function (response) {
+    //     console.log(response);
+    //     let row = $(`tr[data-ticker="${symbol}"]`)
+    //     row.find('.name').html(response.quoteType.shortName)
+    //     row.find('.now_price').html(response.price.regularMarketPrice.fmt)
+    //     // if (response.summaryProfile) {
+    //     row.find('.sector').html(response.summaryProfile.sector)
+    //     row.find('.desc').html(response.summaryProfile.industry)
+    //     // }
+    // calculate(symbol);
+    // })
+
+
+    // ALPHA VANTAGE finance api 호출 때 쓰는 api
+
+    // var settings = {
+    //     "async": true,
+    //     "crossDomain": true,
+    //     "url": "https://alpha-vantage.p.rapidapi.com/query?symbol=" + symbol + "&function=GLOBAL_QUOTE",
+    //     "method": "GET",
+    //     "headers": {
+    //         "x-rapidapi-host": "alpha-vantage.p.rapidapi.com",
+    //         "x-rapidapi-key": "037f6ad97dmshf9c85cd2a219335p1099b8jsna02252858f9f"
+    //     }
+    // }
+    // $.ajax(settings).done(function (response) {
+    //     let row = $(`tr[data-ticker="${symbol}"]`)
+    //     row.find('.now_price').html(response['Global Quote']['05. price'])
+    // })
+    // }
+    calculate(symbol);
+}
+
 
 function calculate(symbol) {
 
     let now_price = $(`tr[data-ticker="${symbol}"] .now_price`).text();
     let avg_price = $(`tr[data-ticker="${symbol}"] .avg_price`).text();
     let quantity = $(`tr[data-ticker="${symbol}"] .quantity`).text();
-
     let evaluation = (now_price * quantity).toFixed(2);
-    // let sum_evaluation = $("#sum_evaluation").text();
-    // console.log(sum_evaluation)
     let investment = (avg_price * quantity).toFixed(2);
     let profit = ((now_price - avg_price) * quantity).toFixed(2);
     let earning_rate = ((profit / (avg_price * quantity)) * 100).toFixed(2) + "%";
-    // let weight_rate = evaluation / sum_evaluation;
 
     $(`tr[data-ticker="${symbol}"] .evaluation`).text(evaluation);
     $(`tr[data-ticker="${symbol}"] .profit`).text(profit);
     $(`tr[data-ticker="${symbol}"] .earning_rate`).text(earning_rate);
     $(`tr[data-ticker="${symbol}"] .investment`).text(investment);
-    // $(`tr[data-ticker="${symbol}"] .weight_rate`).text(weight_rate);
-
 }
+
 
 function makeStockRow(ticker, name, sector, earning_rate, profit, evaluation, investment, avg_price, quantity, weight_rate) {
     let tempHtml = `<tr data-ticker="${ticker}">\
@@ -452,6 +446,11 @@ function showExchange() {
             for (let i = 0; i < response.length; i++) {
                 if (response[i]['name'] == 'USDKRW=X') {
                     $('#exchange').text(response[i]['rate']);
+
+                    let exchange = response[i]['rate'];
+                    let tot_profit_usd = $("#sum_profit_usd").text();
+                    let tot_profit_krw = tot_profit_usd * exchange
+                    $("sum_profit_krw").text(tot_profit_krw)
                     return;
 
                 }
@@ -460,3 +459,16 @@ function showExchange() {
     })
 }
 
+
+function showWeight(symbol) {
+
+    let now_price = $(`tr[data-ticker="${symbol}"] .now_price`).text();
+    let quantity = $(`tr[data-ticker="${symbol}"] .quantity`).text();
+    console.log(sum_eval)
+    let evaluation = now_price * quantity
+    let weight_rate = evaluation / sum_eval;
+
+    $(`tr[data-ticker="${symbol}"] .weight_rate`).text(weight_rate);
+}
+
+showWeight(symbol);

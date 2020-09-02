@@ -46,7 +46,6 @@
                 let ticker = $('#ticker').val();
                 let avg_price = $('#avg_price').val();
                 let quantity = $('#quantity').val();
-                let weight_rate = $('#weight_rate').val();
 
                 if (ticker == "") {
                     alert("티커를 입력해주세요")
@@ -69,7 +68,6 @@
                         'ticker_give': ticker.toUpperCase(),
                         'avg_price_give': avg_price,
                         'quantity_give': quantity,
-                        'weight_rate_give': weight_rate,
                     },
                     success: function (response) { // 성공하면
                         if (response["result"] == "success") {
@@ -155,10 +153,6 @@
                 <div class="form-group">
                     <label for="quantity">수량 </label>
                     <input type="number" class="form-control" id="quantity" placeholder="예시 ) 10, 0.1 ">
-                </div>
-                <div class="form-group">
-                    <label for="weight_rate">비중</label>
-                    <input type="text" class="form-control" id="weight_rate">
                 </div>
 
             </form>
